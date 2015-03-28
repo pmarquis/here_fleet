@@ -1,0 +1,10 @@
+
+# Python files
+*pyc
+
+# Personal IDE files
+*.sublime-workspace
+*.sublime-project
+
+# Personal files
+todolist.txt
