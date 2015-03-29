@@ -1,5 +1,6 @@
 from tornado.web import RequestHandler
 import json
+from db import Database
 
 
 POINTS = [["37.7791648", "-122.42002"], ["37.7782595", "-122.4198174"],
@@ -16,5 +17,22 @@ POINTS = [["37.7791648", "-122.42002"], ["37.7782595", "-122.4198174"],
 
 
 class FleetRealTimeHandler(RequestHandler):
+
     def get(self):
-        self.write(json.dumps(POINTS))
+        self.write(json.dumps(self.get_last_position_vehicles()))
+        # self.write(json.dumps(POINTS))
+
+    def set_default_headers(self):
+        self.set_header('Content-Type', 'text/plain')
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods',
+                        'GET, PUT, POST, DELETE, OPTIONS')
+        self.set_header('Access-Control-Allow-Headers',
+                        'Content-Type, Content-Range, Content-Disposition, Content-Description')
+
+    def get_last_position_vehicles(self):
+        db = Database()
+        query = """SELECT st_x(position), st_y(position)
+                FROM fleet_positions
+                WHERE car_id=1"""
+        return db.execute_query(query, True)
