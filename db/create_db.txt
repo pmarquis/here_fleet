@@ -17,6 +17,7 @@ psql -d template_postgis2 -c "GRANT ALL ON geometry_columns TO PUBLIC;"
 psql -d template_postgis2 -c "GRANT ALL ON geography_columns TO PUBLIC;"
 psql -d template_postgis2 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
 createdb here_fleet_db -T template_postgis2
+psql -d here_fleet_db -f /usr/share/postgresql/9.3/contrib/postgis-2.1/spatial_ref_sys.sql
 
 
 CREATE USER here createdb createuser password 'nokia';
