@@ -2,7 +2,7 @@ import unittest
 from db import Database
 
 
-class TestFleet_positions(unittest.TestCase):
+class TestFleetPositions(unittest.TestCase):
 
     def test_select(self):
         query = """ select st_x(position), st_y(position)
