@@ -20,7 +20,6 @@ class FleetRealTimeHandler(RequestHandler):
 
     def get(self):
         self.write(json.dumps(self.get_last_position_vehicles()))
-        # self.write(json.dumps(POINTS))
 
     def set_default_headers(self):
         self.set_header('Content-Type', 'text/plain')

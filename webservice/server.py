@@ -10,7 +10,7 @@ def make_app():
     return Application([
         url(r"/", HelperHandler),
         url(r"/getRealTimePositions", FleetRealTimeHandler),
-        url(r"/getVehicleRoutes/([^/]+)", VehicleRouteHandler),
+        url(r"/getVehicleRoutes/(.*)", VehicleRouteHandler),
         ])
 
 

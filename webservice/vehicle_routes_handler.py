@@ -1,5 +1,6 @@
 from tornado.web import RequestHandler
 import json
+from db import Database
 
 
 POINTS = [["37.7791648", "-122.42002"], ["37.7782595", "-122.4198174"],
@@ -16,5 +17,40 @@ POINTS = [["37.7791648", "-122.42002"], ["37.7782595", "-122.4198174"],
 
 
 class VehicleRouteHandler(RequestHandler):
-    def get(self):
-        self.write(json.dumps(POINTS))
+
+    def get(self, args):
+        car_id, start_date, end_date = args.split("/")
+        self.write(json.dumps(self.get_last_position_vehicles()))
+
+    def set_default_headers(self):
+        self.set_header('Content-Type', 'text/plain')
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods',
+                        'GET, PUT, POST, DELETE, OPTIONS')
+        self.set_header('Access-Control-Allow-Headers',
+                        'Content-Type, Content-Range, Content-Disposition, Content-Description')
+
+    def get_last_position_vehicles(self):
+        query = """ SELECT ST_AsText(geometry)
+        FROM fleet_positions_by_day where car_id=1; """
+        db = Database()
+        rows = db.execute_query(query, select_query=True)
+        polyline = self.get_polyline_from_linestring(rows[0][0])
+        lat, lng = polyline[0]
+        rows = db.execute_query(query, True)
+        return self.get_polyline_from_linestring(rows[0][0])
+
+    def get_polyline_from_linestring(self, db_linestring):
+        linestring = db_linestring.replace("LINESTRING(", "").replace(")", "")
+        coordinates = linestring.split(',')
+        return [map(float, coordinate.split(" "))
+                for coordinate in coordinates]
+
+    def get_request_data(self):
+        print 'rerezr'
+        data = {}
+        for arg in list(self.request.arguments.keys()):
+            data[arg] = self.get_argument(arg)
+            if data[arg] == '': # Tornado 3.0+ compatibility
+                data[arg] = None
+        return data
