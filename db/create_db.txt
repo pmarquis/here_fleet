@@ -1,10 +1,5 @@
-1.) Create user "here"
-
-psql -d template1 -U postgres
-template1=# CREATE USER here WITH PASSWORD 'nokia';
-
-2.) Create database "here_fleet_db"
-# Manage user
+Create database "here_fleet_db"
+-------------------------------
 
 sudo -su postgres
 createdb -E UTF8 template_postgis2
@@ -16,12 +11,7 @@ psql -d template_postgis2 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/rtpos
 psql -d template_postgis2 -c "GRANT ALL ON geometry_columns TO PUBLIC;"
 psql -d template_postgis2 -c "GRANT ALL ON geography_columns TO PUBLIC;"
 psql -d template_postgis2 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
+template_postgis2=# CREATE USER here createdb createuser password 'nokia';
 createdb here_fleet_db -T template_postgis2
 psql -d here_fleet_db -f /usr/share/postgresql/9.3/contrib/postgis-2.1/spatial_ref_sys.sql
-
-
-CREATE USER here createdb createuser password 'nokia';
-
-
-3.) 
 
