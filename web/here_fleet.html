@@ -22,24 +22,70 @@
 <body>
   <div id="map" style="width: 100%; height: 400px; background: grey" />
 
-   <button onclick="displayVehiclePositions(map)">Display last vehicle positions</button> 
-   <button onclick="displayRoutes(map)">Display car routes</button> 
+   <button onclick="displayVehiclePositionsRealTime(map)">Display real time vehicles position</button> 
+   <button onclick="displayVehicleRoutes(map)">Display vehicle routes</button> 
 
-  <script  type="text/javascript" charset="UTF-8" >    
-function displayMarkers(positions){
-  console.debug("display " + positions.length + " markers");
-  var marker, lat, lng;
-  for(i=0; i<positions.length; i++){
-    lat_lng = positions[i];
-    lat = parseFloat(lat_lng[0]);
-    lng = parseFloat(lat_lng[1]);
-    marker = new H.map.Marker({lat:lat,
-                               lng:lng});
-    map.addObject(marker);
+  <script  type="text/javascript" charset="UTF-8" >
+
+
+var platform = new H.service.Platform({
+    app_id: 'DemoAppId01082013GAL',
+    app_code: 'AJKnXv84fjrb0KIHawS0Tg',
+    useCIT: true
+});
+var defaultLayers = platform.createDefaultLayers();
+
+var map = new H.Map(document.getElementById('map'),
+  defaultLayers.normal.map);
+
+var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+map.setCenter({lat:37.871667, lng:-122.272778}); // Bk
+// map.setCenter({lat:37.779276, lng:-122.419232}); // SF
+map.setZoom(11);
+
+
+var polyline = null;
+var markers = new Array();
+
+function cleanLayer(){
+  while(markers.length != 0){
+    map.removeObject(markers[0]);
+    markers.splice(0, 1);
   }
+  if(polyline != null){
+    map.removeObject(polyline);
+  }
+  polyline = null;
 }
 
-function displayVehiclePositions(map){
+function displayMarkers(positions){
+  cleanLayer();
+  console.debug("display " + positions.length + " markers");
+  var marker, lat, lng;
+  var minLat = 90., maxLat = -90.,
+  minLng = 180., maxLng = -180.;
+  for(i=0; i<positions.length; i++){
+    coordinates = positions[i];
+    lng = parseFloat(coordinates[0]);
+    lat = parseFloat(coordinates[1]);
+    marker = new H.map.Marker({lat:lat,
+                               lng:lng});
+    markers.push(marker);
+    map.addObject(marker);
+    minLng = Math.min(minLng, lng);
+    maxLng = Math.max(maxLng, lng);
+    minLat = Math.min(minLat, lat);
+    maxLat = Math.max(maxLat, lat);
+  }
+    console.debug(maxLng, minLat, minLng, maxLat);
+  var bounds = new H.geo.Rect(maxLat, minLng, minLat, maxLng);
+  map.setViewBounds(bounds, true);
+}
+
+function displayVehiclePositionsRealTime(map){
   var positions_url = "http://localhost:8888/getRealTimePositions";
 
   $.ajax({
@@ -56,15 +102,30 @@ function displayVehiclePositions(map){
   });
 }
 
-function displayRoutes(map, routes){
-  
-  var strip = new H.geo.Strip(),
-  polyline;
-  var coordinates, lat_lng;
+function displayVehicleRoutes(map){
+  var positions_url = "http://localhost:8888/getVehicleRoutes/1/2015-29-03/2015-29-03";
 
-  for(i=0; i<routes.length; i++){
-    coordinates = routes[i];
-    lat_lng = coordinates.split(",");
+  $.ajax({
+      type: 'GET',
+      url: positions_url,
+      async: true,
+      jsonpCallback: 'jsonCallback',
+      contentType: "text/plain",
+      dataType: 'json',
+      success: displayPolyline,
+      error: function(e) {
+         console.error("Error with GET request");
+      }
+  });
+}
+
+function displayPolyline(coordinates){
+  cleanLayer();
+  var strip = new H.geo.Strip();
+  var lat_lng;
+
+  for(i=0; i<coordinates.length; i++){
+    lat_lng = coordinates[i];
     strip.pushLatLngAlt(lat_lng[0], lat_lng[1]);
   }
 
@@ -74,46 +135,11 @@ function displayRoutes(map, routes){
       strokeColor: 'rgba(0, 128, 255, 0.7)'
     }
   });
-  // Add the polyline to the map
   map.addObject(polyline);
-  // And zoom to its bounding rectangle
   map.setViewBounds(polyline.getBounds(), true);
 }
-
-
-/**
- * Boilerplate map initialization code starts below:
- */
-
-//Step 1: initialize communication with the platform
-var platform = new H.service.Platform({
-    app_id: 'DemoAppId01082013GAL',
-    app_code: 'AJKnXv84fjrb0KIHawS0Tg',
-    useCIT: true
-});
-var defaultLayers = platform.createDefaultLayers();
-
-//Step 2: initialize a map  - not specificing a location will give a whole world view.
-var map = new H.Map(document.getElementById('map'),
-  defaultLayers.normal.map);
-
-//Step 3: make the map interactive
-// MapEvents enables the event system
-// Behavior implements default interactions for pan/zoom (also on mobile touch environments)
-var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
-
-// Create the default UI components
-var ui = H.ui.UI.createDefault(map, defaultLayers);
-
-map.setCenter({lat:37.871667, lng:-122.272778}); // Bk
-// map.setCenter({lat:37.779276, lng:-122.419232}); // SF Bay
-
-map.setZoom(11);
-routes = ["37.7791648,-122.42002","37.7782595,-122.4198174","37.7784848,-122.4182189","37.7786565,-122.4165881",
-"37.7788067,-122.4153006","37.7787482,-122.4152379"]
-
-displayRoutes(map, routes);
-// displayVehiclePositions(map);
+// displayVehicleRoutes(map);
+// displayVehiclePositionsRealTime(map);
 
   </script>
 </body>
