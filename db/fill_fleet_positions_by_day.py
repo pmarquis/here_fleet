@@ -7,14 +7,6 @@ INSERT_QUERY = """
 INSERT INTO fleet_positions_by_day (car_id, day, geometry)
     VALUES ({car_id}, now(), ST_GeomFromText('LINESTRING({polyline})', 4326));
 """
-# poyline format: "lat lng, lat lng, lat lng"
-
-# INSERT INTO gtest (ID, NAME, GEOM) 
-# VALUES (
-#   1, 
-#   'First Geometry', 
-#   GeomFromText('LINESTRING(2 3,4 5,6 5,7 8)', -1)
-# );
 
 
 class FleetPositionsByDay(Database):
