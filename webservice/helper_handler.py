@@ -19,7 +19,7 @@ class HelperHandler(RequestHandler):
         doc += self.add_function("Helper", "")
         doc += self.add_function("Get real time fleet positions",
                                  "getRealTimePositions")
-        doc += self.add_function("getVehicleRoutes",
+        doc += self.add_function("Get Vehicle Routes between two days",
                                  "getVehicleRoutes/car_id/start_date/end_date")
         doc += "</div>"
         return doc
