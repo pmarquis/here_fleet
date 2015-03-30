@@ -41,5 +41,5 @@ You will find 2 functions:
 * Display the real time positions.
 * Display the routes of a vehicle between two dates.
 
-The second function use a simplification of the polyline to limit the display.
+The second function use a simplification of the polyline to avoid to display every points.
 Note that at the moment the data are a sample and there is no real time data.
