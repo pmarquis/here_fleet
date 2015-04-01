@@ -69,10 +69,12 @@ function displayMarkers(positions){
   minLng = 180., maxLng = -180.;
   for(i=0; i<positions.length; i++){
     coordinates = positions[i];
-    lng = parseFloat(coordinates[0]);
-    lat = parseFloat(coordinates[1]);
+    lat = parseFloat(coordinates[0]);
+    lng = parseFloat(coordinates[1]);
     marker = new H.map.Marker({lat:lat,
                                lng:lng});
+    icon = new H.map.Icon("img/icon_car.png");
+    marker.setIcon(icon);
     markers.push(marker);
     map.addObject(marker);
     minLng = Math.min(minLng, lng);
@@ -136,6 +138,20 @@ function displayPolyline(coordinates){
     }
   });
   map.addObject(polyline);
+
+  start = coordinates[0];
+  marker_start = new H.map.Marker({lat:start[0],
+                             lng:start[1]});
+  end = coordinates[coordinates.length-1];
+  marker_end = new H.map.Marker({lat:end[0],
+                             lng:end[1]});
+  icon = new H.map.Icon("img/flag2.png");
+  marker_start.setIcon(icon);
+  marker_end.setIcon(icon);
+  markers.push(marker_start);
+  markers.push(marker_end);
+  map.addObject(marker_start);
+  map.addObject(marker_end);
   map.setViewBounds(polyline.getBounds(), true);
 }
 // displayVehicleRoutes(map);
