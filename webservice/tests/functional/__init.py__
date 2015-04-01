@@ -1,0 +1,2 @@
+TEST_MODULES = ['functional.test_fleet_real_time_handler',
+                'functional.test_vehicle_routes_handler']

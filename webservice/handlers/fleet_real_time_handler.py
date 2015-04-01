@@ -31,7 +31,7 @@ class FleetRealTimeHandler(RequestHandler):
 
     def get_last_position_vehicles(self):
         db = Database()
-        query = """SELECT st_x(position), st_y(position)
+        query = """SELECT st_y(position), st_x(position)
                 FROM fleet_positions
                 WHERE car_id=1"""
         return db.execute_query(query, True)
