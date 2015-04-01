@@ -2,21 +2,29 @@ Here fleet
 ==========
 This is a demo application to display the real time data and history of here fleet.
 
-Database
--------
-### Pre-requisite ###
+Pre-requisite
+--------------------
+### Database pre-requisite ###
 Postgres and Postgis should be installed. If not you can install it with apt: 
 * sudo apt-get install postgresql-9.3					
-* sudo apt-get install postgresql-9.3-postgis-2.1			
+* sudo apt-get install postgresql-9.3-postgis-2.1
 
+### Python pre-requisite ###
+Tornado, psycopg2, nose, fabric should be installed: 
+* pip install tornado
+* pip install psycopg2
+* pip install nose
+* pip install fabric
+
+
+Database
+-------
 ### Install
 * To create the database, follow instructions in db/create_db.txt
 * To create the tables and add some data:
 ~~~
-python fill_fleet_positions.py
-python fill_fleet_positions_by_day.py
+fab fill_database
 ~~~
-
 
 
 Web service
@@ -26,16 +34,22 @@ Tornado and psycopg2 should be installed:
 * pip install tornado
 * pip install psycopg2			
 
-### Start server
+### Start server ###
 ~~~
-python webservice/server.py
+fab start
 ~~~
-You can check if the server is started using this URL:
+You can also check if the server is started using this URL:
 [http://127.0.0.1:8888](http://127.0.0.1:8888)
+
+### Test the web service ###
+You should have start the server from an other terminal
+~~~
+fab functional_tests
+~~~
 
 Web page
 --------
-You can visualize data on the web page here_fleet.html
+You can visualize data on the web page web/here_fleet.html
 
 You will find 2 functions:
 * Display the real time positions.

@@ -1,9 +1,7 @@
 from tornado.ioloop import IOLoop
 from tornado.web import Application, url
 
-from fleet_real_time_handler import FleetRealTimeHandler
-from vehicle_routes_handler import VehicleRouteHandler
-from helper_handler import HelperHandler
+from handlers import FleetRealTimeHandler, VehicleRouteHandler, HelperHandler
 
 
 def make_app():
