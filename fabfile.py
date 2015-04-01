@@ -1,4 +1,4 @@
-from fabric.api import local, cd
+from fabric.api import local, lcd
 
 
 def start():
@@ -10,6 +10,7 @@ def functional_tests():
 
 
 def fill_database():
-    with cd("db/"):
+    with lcd("db"):
+        local("pwd")
         local("python fill_fleet_positions.py")
         local("python fill_fleet_positions_by_day.py")
