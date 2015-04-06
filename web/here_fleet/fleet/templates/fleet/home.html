@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8" />
+  <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+  <title>Here Vehicles fleet</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css"
+    href="{% static 'fleet/css/here/3.0/mapsjs-ui.css" />
+  <script type="text/javascript" charset="UTF-8"
+    src="{% static 'fleet/js/here/3.0/mapsjs-core.js' %}"></script>
+  <script type="text/javascript" charset="UTF-8"
+    src="{% static 'fleet/js/here/3.0/mapsjs-service.js' %}"></script>
+  <script type="text/javascript" charset="UTF-8"
+    src="{% static 'fleet/js/here/3.0/mapsjs-mapevents.js' %}"></script>
+  <script type="text/javascript"  charset="UTF-8"
+    src="{% static 'fleet/js/here/3.0/mapsjs-ui.js' %}"></script>
+
+  <script type="text/javascript"  charset="UTF-8"
+    src="{% static 'fleet/js/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<body>
+  <div id="map" style="width: 100%; height: 400px; background: grey" />
+  <script  type="text/javascript" charset="UTF-8" >
+
+var platform = new H.service.Platform({
+    app_id: 'DemoAppId01082013GAL',
+    app_code: 'AJKnXv84fjrb0KIHawS0Tg',
+    useCIT: true
+});
+var defaultLayers = platform.createDefaultLayers();
+
+var map = new H.Map(document.getElementById('map'),
+  defaultLayers.normal.map);
+
+var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+map.setCenter({lat:37.871667, lng:-122.272778}); // Bk
+// map.setCenter({lat:37.779276, lng:-122.419232}); // SF
+map.setZoom(11);
+
+
+var polyline = null;
+var markers = new Array();
+
+function cleanLayer(){
+  while(markers.length != 0){
+    map.removeObject(markers[0]);
+    markers.splice(0, 1);
+  }
+  if(polyline != null){
+    map.removeObject(polyline);
+  }
+  polyline = null;
+}
+
+function displayMarkers(positions){
+  cleanLayer();
+  console.debug("display " + positions.length + " markers");
+  var marker, lat, lng;
+  var minLat = 90., maxLat = -90.,
+  minLng = 180., maxLng = -180.;
+  for(i=0; i<positions.length; i++){
+    coordinates = positions[i];
+    lat = parseFloat(coordinates[0]);
+    lng = parseFloat(coordinates[1]);
+    marker = new H.map.Marker({lat:lat,
+                               lng:lng});
+    {% load static %}
+    icon = new H.map.Icon("{% static 'fleet/img/icon_car.png' %}");
+    marker.setIcon(icon);
+    markers.push(marker);
+    map.addObject(marker);
+    minLng = Math.min(minLng, lng);
+    maxLng = Math.max(maxLng, lng);
+    minLat = Math.min(minLat, lat);
+    maxLat = Math.max(maxLat, lat);
+  }
+    console.debug(maxLng, minLat, minLng, maxLat);
+  var bounds = new H.geo.Rect(maxLat, minLng, minLat, maxLng);
+  map.setViewBounds(bounds, true);
+}
+
+function displayVehiclePositionsRealTime(map){
+  var positions_url = "http://localhost:8888/getRealTimePositions";
+
+  $.ajax({
+      type: 'GET',
+      url: positions_url,
+      async: true,
+      jsonpCallback: 'jsonCallback',
+      contentType: "text/plain",
+      dataType: 'json',
+      success: displayMarkers,
+      error: function(e) {
+         console.log("Error with GET request");
+      }
+  });
+}
+
+function displayVehicleRoutes(map){
+  var positions_url = "http://localhost:8888/getVehicleRoutes/1/2015-29-03/2015-29-03";
+
+  $.ajax({
+      type: 'GET',
+      url: positions_url,
+      async: true,
+      jsonpCallback: 'jsonCallback',
+      contentType: "text/plain",
+      dataType: 'json',
+      success: displayPolyline,
+      error: function(e) {
+         console.error("Error with GET request");
+      }
+  });
+}
+
+function displayPolyline(coordinates){
+  cleanLayer();
+  var strip = new H.geo.Strip();
+  var lat_lng;
+
+  for(i=0; i<coordinates.length; i++){
+    lat_lng = coordinates[i];
+    strip.pushLatLngAlt(lat_lng[0], lat_lng[1]);
+  }
+
+  polyline = new H.map.Polyline(strip, {
+    style: {
+      lineWidth: 4,
+      strokeColor: 'rgba(0, 128, 255, 0.7)'
+    }
+  });
+  map.addObject(polyline);
+
+  start = coordinates[0];
+  marker_start = new H.map.Marker({lat:start[0],
+                             lng:start[1]});
+  end = coordinates[coordinates.length-1];
+  marker_end = new H.map.Marker({lat:end[0],
+                             lng:end[1]});
+  icon = new H.map.Icon("img/flag.png");
+  marker_start.setIcon(icon);
+  marker_end.setIcon(icon);
+  markers.push(marker_start);
+  markers.push(marker_end);
+  map.addObject(marker_start);
+  map.addObject(marker_end);
+  map.setViewBounds(polyline.getBounds(), true);
+}
+// displayVehicleRoutes(map);
+// displayVehiclePositionsRealTime(map);
+
+  </script>
+  <button onclick="displayVehiclePositionsRealTime(map)">Display real time vehicles position</button> 
+  <br/>
+  <button onclick="displayVehicleRoutes(map)">Display vehicle routes</button> 
+  Select a car <select name="car">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+</body>
+</html>
+
