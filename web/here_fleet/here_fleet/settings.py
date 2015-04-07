@@ -40,7 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'fleet'
 )
-
+    
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,6 +72,7 @@ TEMPLATES = [
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
+    os.path.join(BASE_DIR, 'here_fleet/templates')
 )
 
 WSGI_APPLICATION = 'here_fleet.wsgi.application'

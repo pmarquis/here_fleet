@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-  <meta charset="UTF-8" />
-  <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-  <title>Here Vehicles fleet</title>
-  {% load static %}
-  <link rel="stylesheet" type="text/css"
-    href="{% static 'fleet/css/here/3.0/mapsjs-ui.css" />
+{% extends "fleet/base.html" %}
+{% block header-extensions %}
+{% load static %}
+<title>Here Vehicles Fleet</title>  
+<link rel="stylesheet" type="text/css"
+    href="{% static 'fleet/css/here/3.0/mapsjs-ui.css' %}" />
   <script type="text/javascript" charset="UTF-8"
     src="{% static 'fleet/js/here/3.0/mapsjs-core.js' %}"></script>
   <script type="text/javascript" charset="UTF-8"
@@ -17,11 +12,18 @@
     src="{% static 'fleet/js/here/3.0/mapsjs-mapevents.js' %}"></script>
   <script type="text/javascript"  charset="UTF-8"
     src="{% static 'fleet/js/here/3.0/mapsjs-ui.js' %}"></script>
-
   <script type="text/javascript"  charset="UTF-8"
-    src="{% static 'fleet/js/jquery/1.11.1/jquery.min.js"></script>
-</head>
-<body>
+    src="{% static 'fleet/js/jquery/1.11.1/jquery.min.js' %}"></script>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script><!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block content %}
   <div id="map" style="width: 100%; height: 400px; background: grey" />
   <script  type="text/javascript" charset="UTF-8" >
 
@@ -103,8 +105,10 @@ function displayVehiclePositionsRealTime(map){
 }
 
 function displayVehicleRoutes(map){
-  var positions_url = "http://localhost:8888/getVehicleRoutes/1/2015-29-03/2015-29-03";
-
+  var positions_url = "http://localhost:8888/getVehicleRoutes/";
+  positions_url += $("#carSelector option:selected").val() + "/";
+  positions_url += $("#datepickerFrom").val() + "/";
+  positions_url += $("#datepickerTo").val();
   $.ajax({
       type: 'GET',
       url: positions_url,
@@ -143,7 +147,7 @@ function displayPolyline(coordinates){
   end = coordinates[coordinates.length-1];
   marker_end = new H.map.Marker({lat:end[0],
                              lng:end[1]});
-  icon = new H.map.Icon("img/flag.png");
+  icon = new H.map.Icon("{% static 'fleet/img/flag.png' %}");
   marker_start.setIcon(icon);
   marker_end.setIcon(icon);
   markers.push(marker_start);
@@ -155,17 +159,48 @@ function displayPolyline(coordinates){
 // displayVehicleRoutes(map);
 // displayVehiclePositionsRealTime(map);
 
-  </script>
-  <button onclick="displayVehiclePositionsRealTime(map)">Display real time vehicles position</button> 
-  <br/>
-  <button onclick="displayVehicleRoutes(map)">Display vehicle routes</button> 
-  Select a car <select name="car">
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-  </select>
-</body>
-</html>
-
+</script>
+<div class="container">
+  <div class="row text-center">
+    <div class="col-xs-12 col-sm-6">
+      <p >
+      <h2>Real time positions</h2>
+      Get the position of the vehicle in real time.
+      <br/>
+      <button onclick="displayVehiclePositionsRealTime(map)" class="btn btn-lg btn-primary">Vehicles positions</button> 
+      <p/>
+    </div>
+    <div class="col-xs-12 col-sm-6 form-group">
+      <p class="col-xs-12 col-sm-6">
+      <h2>Vehicle routes</h2>
+      Get the routes of a vehicle between two dates.
+      <br/>
+      Select a car <select name="car" id="carSelector">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+      From: <input type="text" altFormat="yy-mm-dd" id="datepickerFrom">
+      To: <input type="text" id="datepickerTo">
+      <button onclick="displayVehicleRoutes(map)" class="btn btn-lg btn-primary">Display vehicle routes</button> 
+      </p>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" charset="UTF-8" >
+$( "#datepickerFrom").datepicker({
+  dateFormat: "yy-mm-dd"
+});
+$( "#datepickerTo").datepicker({
+  dateFormat: "yy-mm-dd"
+});
+$(function() {
+  $("#datepickerFrom").datepicker();
+});
+$(function() {
+  $("#datepickerTo").datepicker();
+});
+</script>
+{% endblock %}
